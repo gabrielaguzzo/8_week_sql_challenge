@@ -38,7 +38,7 @@ Tabela 1 - Weekly Sales
 
  # 3. Estudos
 
- # A. Etapa de limpeza de dados
+ ## A. Etapa de limpeza de dados
 
  Nessa etapa foi solicitado que, em uma única consulta, fossem executadas as seguintes operações e gerada uma nova tabela no esquema data_mart denominada clean_weekly_sales:
 
@@ -100,9 +100,11 @@ from data_mart.weekly_sales
 );
 ```
 
-# B. Análise exploratória
+## B. Análise exploratória
 
 **1. Qual dia da semana é usado para cada valor week_date?**
+
+- Utilizar SELECT DISTINCT para selecionar os valores de dia da semana
 
 Query:
 
@@ -118,6 +120,10 @@ Resultado:
 | monday      | 
 
 **2. Que intervalo de números semanais está faltando no conjunto de dados?**
+
+- Criar uma CTE com o comando WITH para criar uma série com os números das semanas em um ano (1 a 52, pois são 52 semanas em um ano);
+
+- Fazer um LEFT JOIN com a tabela clean_weekly_sales para descobrir quais valores de week_number serão nulos e utilizar SELECT DISTINCT para selecioná-los.
 
 Query:
 
@@ -167,6 +173,8 @@ Resultado:
 
 **3. Quantas transações totais ocorreram para cada ano no conjunto de dados?**
 
+- Utilizar SUM para somar as transações e agrupá-las por ano.
+
 Query:
 
 ```sql
@@ -187,6 +195,8 @@ Resultado:
 | 2020          | 375813651          |
 
 **4. Qual é o total de vendas de cada região em cada mês?**
+
+- Utilizar SUM para somar o valor total de vendas e agrupá-las por região e por mês.
 
 Query:
 
@@ -219,6 +229,8 @@ Resultado:
 
 **5. Qual é a contagem total de transações para cada plataforma?**
 
+- Utilizar SUM para somar o valor total de vendas e agrupá-las por plataforma.
+
 Query:
 
 ```sql
@@ -238,6 +250,10 @@ Resultado:
 | Shopify  | 5925169            | 
 
 **6. Qual é a porcentagem de vendas de Retail vs Shopify para cada mês?**
+
+- Criar uma CTE com o comando WITH para somar, por meio do SUM, o valor total de vendas por ano e por mês para cada tipo de plataforma;
+
+- Utilizar ROUND para arredondar o valor do cálculo para a porcentagem, agrupando por mês e por ano.
 
 Query:
 
@@ -275,6 +291,10 @@ Resultado:
 
 **7. Qual é a porcentagem de vendas por grupo demográfico para cada ano no conjunto de dados?**
 
+- Criar uma CTE com o comando WITH para somar, por meio do SUM, o valor total de vendas para cada ano e cada grupo demográfico;
+
+- Utilizar ROUND para arredondar o valor do cálculo para a porcentagem, agrupando por ano.
+
 Query:
 
 ```sql
@@ -305,6 +325,10 @@ Resultado:
 | 2020          | 32.73               | 28.72              |38.55               |
 
 **8. Quais faixas etárias e valores demográficos contribuem mais para as vendas no varejo?**
+
+- Utilizar SUM e ROUND para somar o valor total de vendas no varejo e arredondar o valor em percentual;
+
+- Agrupar por age_band e demographic e ordenar em ordem decrescente pelo valor de vendas no varejo.
 
 Query:
 
@@ -337,6 +361,8 @@ Resultado:
 
 **9. Podemos usar a coluna avg_transaction para encontrar o tamanho médio da transação para cada ano no Retail vs Shopify? Se não, como você calcularia isso?**
 
+- Não podemos usar a coluna avg_transaction para encontrar a média da transação para cada ano, pois a soma dessas médias é diferente da média anual. Assim, a query abaixo mostra essa diferença:
+
 Query:
 
 ```sql
@@ -353,16 +379,19 @@ order by calendar_year, platform;
 Resultado:
 
 | calendar_year | platform | avg_transaction_row | avg_transaction_group |
-|---------------|-------------|------------------|-----------------------|
-| 2018          | Retail     | 43                |36                     |
-| 2018          | Shopify    | 188               |192                    |
-| 2019          | Retail     | 42                |36                     |
-| 2019          | Shopify    | 178               |183                    |
-| 2020          | Retail     | 41                |36                     |
-| 2020          | Shopify    | 175               |179                    |
+|---------------|----------|---------------------|-----------------------|
+| 2018          | Retail   | 43                  |36                     |
+| 2018          | Shopify  | 188                 |192                    |
+| 2019          | Retail   | 42                  |36                     |
+| 2019          | Shopify  | 178                 |183                    |
+| 2020          | Retail   | 41                  |36                     |
+| 2020          | Shopify  | 175                 |179                    |
 
-# C. Análise Antes e Depois
+- ```avg_transaction_row``` calcula a média da transação dividindo as vendas de cada linha pelo número de transações nessa linha.
 
+- Por outro lado, ```avg_transaction_group``` calcula a média da transação dividindo o total de vendas de todo o conjunto de dados pelo número total de transações.
+
+## C. Análise Antes e Depois
 
 Essa técnica geralmente é usada quando inspecionamos um evento importante e queremos inspecionar o impacto antes e depois de um determinado momento. 
 
@@ -468,19 +497,23 @@ order by calendar_year;
 Resultado:
 
 | calendar_year | before_sales | after_sales | sales_difference | percentage_difference |
-|------------- -|--------------|-------------|------------------|-----------------------|
+|---------------|--------------|-------------|------------------|-----------------------|
 |2018           | 2125140809   | 2129242914  | 4102105          |0.19                   |
 |2019           | 2249989796   | 2252326390  | 2336594          |0.10                   |
 |2020           | 2345878357   | 2318994169  | -26884188        |-1.15                  |
 
-# D. Questão Bônus
+## D. Questão Bônus
 
 Quais áreas do negócio têm o maior impacto negativo no desempenho das métricas de vendas em 2020 nas 12 semanas anteriores e posteriores?
 
 *```region```
+
 *```platform```
+
 *```age_band```
+
 *```demographic```
+
 *```customer_type```
 
 Você tem alguma recomendação adicional para a equipe de Danny no Data Mart ou algum insight interessante baseado nesta análise?
@@ -563,7 +596,7 @@ Resultado:
 
 Query:
 
-````sql
+```sql
 with sales_cte as (
 	select
 		*
@@ -621,3 +654,48 @@ select
 from before_after_changes
 order by percentage_difference;
 ```
+
+Resultado:
+
+|demographic| before_sales | after_sales | sales_difference | percentage_difference |
+|------------|--------------|-------------|------------------|-----------------------|
+|Unknown     | 2764354464   | 2671961443  | -92393021        |-3.34                  |
+|Families    | 2328329040   | 2286009025  |-42320015         |-1.82                  |
+|Couples     | 2033589643   | 2015977285  |-17612358         |-0.87                  |
+
+**5. Mudanças nas vendas por ```customer_type```**
+
+Query:
+
+```sql
+with sales_cte as (
+	select
+		*
+	from clean_weekly_sales
+	where week_number between (25-12) and (25+11)
+	and calendar_year = '2020'
+),
+before_after_changes as (
+	select
+		customer_type,
+		sum(case when week_number between 13 and 24 then sales else null end) as before_sales,
+		sum(case when week_number between 25 and 36 then sales else null end) as after_sales
+	from sales_cte
+	group by customer_type
+)
+select
+	*,
+	(after_sales - before_sales) as sales_difference,
+	round(100*(after_sales - before_sales)::numeric/before_sales, 2) as percentage_difference
+from before_after_changes
+order by percentage_difference;
+```
+
+Resultado:
+
+|customer_type| before_sales | after_sales | sales_difference | percentage_difference |
+|------------|---------------|-------------|------------------|-----------------------|
+|Guest       | 2573436301    | 2496233635  | -77202666        |-3.00                  |
+|Existing    | 3690116427    | 3606243454  |-83872973         |-2.27                  |
+|New         | 862720419     | 871470664   |8750245           |1.01                   |
+
