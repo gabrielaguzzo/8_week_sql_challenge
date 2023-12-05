@@ -1,4 +1,4 @@
-Data Mart
+# Data Mart
 
 _Challenge #5 from 8 Week SQL Challenge_
 
@@ -87,7 +87,7 @@ select
 	case
 		when segment like '%1' then 'Young Adults'
 		when segment like '%2' then 'Middle Aged'
-		when segment like '3%' or segment like '%4' then 'Retirees'
+		when segment like '%3' or segment like '%4' then 'Retirees'
 		else 'Unknown' end as age_band,
 	case
 		when segment like 'C%' then 'Couples'
@@ -170,6 +170,8 @@ Resultado:
 | 50          |
 | 51          |
 | 52          |
+
+As semanas 1 a 12 e as semanas 37 a 52 estão faltando no conjunto de dados.
 
 **3. Quantas transações totais ocorreram para cada ano no conjunto de dados?**
 
@@ -351,13 +353,14 @@ Resultado:
 | age_band     | demographic | retail_sales | percentage |
 |--------------|-------------|--------------|------------|
 | Unknown      | Unknown     | 16067285533  |40.52       |
-| Unknown      | Families    | 66346869     |16.73       |
-| Unknown      | Couples     | 4493754387   |11.33       |
+| Retirees     | Families    | 66346869     |16.73       |
+| Retirees     | Couples     | 4493754387   |16.07       |
 | Middle Aged  | Families    | 4354091554   |10.98       |
 | Young Adults | Couples     | 2602922797   |6.56        |
-| Retirees     | Couples     | 1876825627   |4.73        |
 | Middle Aged  | Couples     | 1854160330   |4.68        |
 | Young Adults | Families    | 1770889293   |4.47        |
+
+As maiores vendas no varejo vêm da contribuição de faixa etária e grupo demográfico desconhecidos ("Unknown"), representando 40,52% das vendas, seguidas por famílias ("Families") aposentadas ("Retirees"), com 16,73% e casais ("Couples") aposentados ("Retirees"), com 16,07%.
 
 **9. Podemos usar a coluna avg_transaction para encontrar o tamanho médio da transação para cada ano no Retail vs Shopify? Se não, como você calcularia isso?**
 
@@ -401,6 +404,8 @@ Usando esta abordagem de análise, deve-se responder às seguintes perguntas:
 
 **1. Qual é o total de vendas nas 4 semanas antes e depois de 15/06/2020? Qual a taxa de crescimento ou redução nos valores reais e percentual de vendas?**
 
+- Antes de prosseguir, deve-se determinar o número da semana correspondente a '2020-06-15' para usá-lo como filtro em nossa análise.
+
 Query:
 
 ```sql
@@ -408,7 +413,21 @@ select distinct
 	week_number	
 from clean_weekly_sales
 where week_date = '2020-06-15';
+```
 
+| week_number | 
+|-------------|
+| 25          | 
+
+- O week_number de 2020-06-15 é 25. Dessa forma, deve-se:"
+
+- Criar uma CTE (sales_cte) com o WITH para selecionar os dados correspondentes a 4 semanas antes e 4 semanas depois da semana 25, no ano de 2020;
+
+- Criar uma CTE (before_after_changes) com CASE para encontrar o total de vendas, com SUM, das 4 semanas antes e das 4 semanas depois da semana 25;
+
+- Calcular a diferença do valor total das vendas e a diferença em porcentagem.
+
+```sql
 with sales_cte as (
 	select
 		*
@@ -435,7 +454,11 @@ Resultado:
 |--------------|-------------|------------------|-----------------------|
 | 2345878357   | 2318994169  | -26884188        |-1.15                  |
 
+Desde a implementação das novas embalagens sustentáveis, houve uma diminuição nas vendas no valor de 26.884.188 dólares, refletindo uma variação negativa de 1,15%. 
+
 **2. E quanto as 12 semanas inteiras antes e depois?**
+
+- Aplicar uma abordagem similar, mas agora para 12 semanas antes e depois da semana 25.
 
 Query:
 
@@ -466,7 +489,13 @@ Resultado:
 |--------------|-------------|------------------|-----------------------|
 | 7126273147   | 6973947753  | -152325394       |-2.14                  |
 
+Parece que as vendas sofreram uma queda ainda maior, agora em 2,14% negativos.
+
 **3. Como as métricas de vendas desses 2 períodos antes e depois se comparam aos anos anteriores em 2018 e 2019?**
+
+**4 semanas antes e depois da iserção da mudança:**
+
+- Pode-se utilizar a mesma solução anterior, para 4 semanas antes e depois, mas dessa vez adicionar a variável calendar_year, pois estaremos analisando para os anos de 2018 e 2019, além de 2020.
 
 Query:
 
@@ -502,21 +531,63 @@ Resultado:
 |2019           | 2249989796   | 2252326390  | 2336594          |0.10                   |
 |2020           | 2345878357   | 2318994169  | -26884188        |-1.15                  |
 
+Em 2018 houve uma variação positiva de vendas de 0.19% no período de 4 semanas antes e 4 semanas depois da data da inserção da mudança. Em 2019 essa variação ainda era positiva mas caiu para 0,10%. Já em 2020 houve uma queda na variação de vendas de -1,15%, quando a mudança realmente aconteceu. É uma queda considerávem em relação aos anos anteriores.
+
+**12 semanas antes e depois da iserção da mudança:**
+
+Query:
+
+```sql
+with sales_cte as (
+	select
+		*
+	from clean_weekly_sales
+	where week_number between (25-12) and (25+11)
+	and calendar_year in ('2018', '2019', '2020')
+),
+before_after_changes as (
+	select
+		calendar_year,
+		sum(case when week_number between 13 and 24 then sales else null end) as before_sales,
+		sum(case when week_number between 25 and 36 then sales else null end) as after_sales
+	from sales_cte
+	group by calendar_year
+)
+select
+	*,
+	(after_sales - before_sales) as sales_difference,
+	round(100*(after_sales - before_sales)::numeric/before_sales, 2) as percentage_difference
+from before_after_changes
+order by calendar_year;
+```
+
+Resultado:
+
+| calendar_year | before_sales | after_sales | sales_difference | percentage_difference |
+|---------------|--------------|-------------|------------------|-----------------------|
+|2018           | 6396562317   | 6500818510  | 104256193        |1.63                   |
+|2019           | 6883386397   | 6862646103  | -20740294        |-0.30                  |
+|2020           | 7126273147   | 6973947753  | -152325394       |-2.14                  |
+
+Em relação a 12 semanas antes e 12 semanas depois da data de modificação, percebe-se uma variação nas vendas em todos os 3 anos. Contudo, dessa vez a diferença percentual é maior do que na análise anterior, sendo de 3,73% (1,63+2,14).
+
 ## D. Questão Bônus
 
 Quais áreas do negócio têm o maior impacto negativo no desempenho das métricas de vendas em 2020 nas 12 semanas anteriores e posteriores?
 
-*```region```
+```region```
 
-*```platform```
+```platform```
 
-*```age_band```
+```age_band```
 
-*```demographic```
+```demographic```
 
-*```customer_type```
+```customer_type```
 
 Você tem alguma recomendação adicional para a equipe de Danny no Data Mart ou algum insight interessante baseado nesta análise?
+
+***
 
 **1. Mudanças nas vendas por ```região```**
 
@@ -557,6 +628,12 @@ Resultado:
 |AFRICA         | 1709537105   | 1700390294  | -9146811         |-0.54                  |
 |EUROPE         | 108886567    | 114038959   | 5152392          |4.73                   |
 
+- De modo geral, as vendas caíram em todas as regiões após a mudança nas embalagens. 
+
+- A Europa se destaca por ser a única região que apresentou um aumento nas vendas. O Data Mart deveria investir mais nessa região, uma vez que seus clientes parecem acatar mudanças de modo positivo.
+
+***
+
 **2. Mudanças nas vendas por ```platform```**
 
 Query:
@@ -592,6 +669,10 @@ Resultado:
 |Retail         | 6906861113   | 6738777279  | -168083834       |-2.43                  |
 |Shopify        | 219412034    | 235170474   | 15758440         |7.18                   |
 
+- As vendas aumentaram em plataformas "Shopify" em 7,18% e caíram em plataformas de "Retail" em -2,43%. Data Mart deveria colocar mais produtos com embalagens sustentáveis em vendas Shopify.
+
+***
+
 **3. Mudanças nas vendas por ```age_band```**
 
 Query:
@@ -624,10 +705,14 @@ Resultado:
 
 | age_band      | before_sales | after_sales | sales_difference | percentage_difference |
 |---------------|--------------|-------------|------------------|-----------------------|
-|Unknown        | 4811054506   | 4692876555  | -118177951       |-2.46                  |
+|Unknown        | 2764354464   | 2671961443  | -92393021        |-3.34                  |
 |Middle Aged    | 1164847640   | 1141853348  |-22994292         |-1.97                  |
-|Retirees       | 348564473    | 344799882   | -3764591         |-1.08                  |
+|Retirees       | 2395264515   | 2365714994  | -29549521        |-1.23                  |
 |Young Adults   | 801806528    | 794417968   |-7388560          |-0.92                  |
+
+- As vendas caíram de um modo geral para todas as faixas etárias, mas principalmente para faixas etárias desconhecidas ("Unknown"). O Data Mart deveria investigar melhor esses clientes e estudar uma mudança nessa abordagem sustentável com eles.
+
+***
 
 **4. Mudanças nas vendas por ```demographic```**
 
@@ -662,6 +747,10 @@ Resultado:
 |Unknown     | 2764354464   | 2671961443  | -92393021        |-3.34                  |
 |Families    | 2328329040   | 2286009025  |-42320015         |-1.82                  |
 |Couples     | 2033589643   | 2015977285  |-17612358         |-0.87                  |
+
+- As vendas caíram para todos os grupos demográficos. Mais uma vez, é necessário investigar quem são os clientes com grupo demográfico desconhecido ("Unknown").
+
+***
 
 **5. Mudanças nas vendas por ```customer_type```**
 
@@ -699,3 +788,8 @@ Resultado:
 |Existing    | 3690116427    | 3606243454  |-83872973         |-2.27                  |
 |New         | 862720419     | 871470664   |8750245           |1.01                   |
 
+- Clientes novos apresentaram maior adesão às embalagens sustentáveis, apresentando um aumento nas vendas para esse público em 1.01%. Ainda que pareça pouco, é interessante perceber a diferença entre esses clientes e os clientes antigos ("Guest" e "Existing").
+
+- Aparentemente é difícil mudar os comportamentos dos clientes que já utilizam os serviços da Data Mart. Seria interessante estudar uma nova forma de abordar esses clientes para que eles façam uma maior adesão à essa mudança e as vendas não sejam prejudicadas.
+
+- Também podem ser feitas maiores pesquisas sobre os clientes novos, a fim de entender o que os levou a aderir às embalagens sustentáveis e qual o perfil desse público, para que, a partir daí, novas mudanças possam ser incorporadas no futuro.
