@@ -819,3 +819,13 @@ Resultado:
 - Aparentemente é difícil mudar os comportamentos dos clientes que já utilizam os serviços da Data Mart. Seria interessante estudar uma nova forma de abordar esses clientes para que eles façam uma maior adesão à essa mudança e as vendas não sejam prejudicadas.
 
 - Também podem ser feitas maiores pesquisas sobre os clientes novos, a fim de entender o que os levou a aderir às embalagens sustentáveis e qual o perfil desse público, para que, a partir daí, novas mudanças possam ser incorporadas no futuro.
+
+***
+
+# 4. Conclusões
+
+De modo geral, após a análise dos dados, podemos concluir que a modificação das embalagens para embalagens sustentáveis não foi bem aceita pelos clientes da Data Mart, com exceção dos clientes da região da Europa e dos clientes novos, além dos clientes que compram pela plataforma Shopify. Dessa forma, eu indicaria duas abordagens:
+
+1. Investigar melhor quem são esses clientes que acataram as modificações e porquê, de modo a futuramente focar neles para novas mudanças em relação à prática sustentáveis;
+
+2. Descobrir por qual razão a maioria deixou de comprar na Data Mart e analisar se a mudança é puramente por conta da modificação da embalagem em si ou se existe algum outro impacto que a Data Mart ainda não percebeu.
