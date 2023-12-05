@@ -119,6 +119,8 @@ Resultado:
 |-------------|
 | monday      | 
 
+***
+
 **2. Que intervalo de números semanais está faltando no conjunto de dados?**
 
 - Criar uma CTE com o comando WITH para criar uma série com os números das semanas em um ano (1 a 52, pois são 52 semanas em um ano);
@@ -173,6 +175,8 @@ Resultado:
 
 As semanas 1 a 12 e as semanas 37 a 52 estão faltando no conjunto de dados.
 
+***
+
 **3. Quantas transações totais ocorreram para cada ano no conjunto de dados?**
 
 - Utilizar SUM para somar as transações e agrupá-las por ano.
@@ -195,6 +199,8 @@ Resultado:
 | 2018          | 346406460          |
 | 2019          | 365639285          |
 | 2020          | 375813651          |
+
+***
 
 **4. Qual é o total de vendas de cada região em cada mês?**
 
@@ -229,6 +235,8 @@ Resultado:
 | ASIA   | 4            | 1804628707   |
 | ASIA   | 5            | 1526285399   |
 
+***
+
 **5. Qual é a contagem total de transações para cada plataforma?**
 
 - Utilizar SUM para somar o valor total de vendas e agrupá-las por plataforma.
@@ -250,6 +258,8 @@ Resultado:
 |----------|--------------------|
 | Retail   | 1081934227         |
 | Shopify  | 5925169            | 
+
+***
 
 **6. Qual é a porcentagem de vendas de Retail vs Shopify para cada mês?**
 
@@ -291,6 +301,8 @@ Resultado:
 | 2018          | 6            | 97.76             |2.24                |
 | 2018          | 7            | 97.75             |2.25                |
 
+***
+
 **7. Qual é a porcentagem de vendas por grupo demográfico para cada ano no conjunto de dados?**
 
 - Criar uma CTE com o comando WITH para somar, por meio do SUM, o valor total de vendas para cada ano e cada grupo demográfico;
@@ -325,6 +337,8 @@ Resultado:
 | 2018          | 31.99               | 26.38              |41.63               |
 | 2019          | 32.47               | 27.28              |40.25               |
 | 2020          | 32.73               | 28.72              |38.55               |
+
+***
 
 **8. Quais faixas etárias e valores demográficos contribuem mais para as vendas no varejo?**
 
@@ -362,6 +376,8 @@ Resultado:
 
 As maiores vendas no varejo vêm da contribuição de faixa etária e grupo demográfico desconhecidos ("Unknown"), representando 40,52% das vendas, seguidas por famílias ("Families") aposentadas ("Retirees"), com 16,73% e casais ("Couples") aposentados ("Retirees"), com 16,07%.
 
+***
+
 **9. Podemos usar a coluna avg_transaction para encontrar o tamanho médio da transação para cada ano no Retail vs Shopify? Se não, como você calcularia isso?**
 
 - Não podemos usar a coluna avg_transaction para encontrar a média da transação para cada ano, pois a soma dessas médias é diferente da média anual. Assim, a query abaixo mostra essa diferença:
@@ -390,9 +406,11 @@ Resultado:
 | 2020          | Retail   | 41                  |36                     |
 | 2020          | Shopify  | 175                 |179                    |
 
-- ```avg_transaction_row``` calcula a média da transação dividindo as vendas de cada linha pelo número de transações nessa linha.
+```avg_transaction_row``` calcula a média da transação dividindo as vendas de cada linha pelo número de transações nessa linha.
 
-- Por outro lado, ```avg_transaction_group``` calcula a média da transação dividindo o total de vendas de todo o conjunto de dados pelo número total de transações.
+Por outro lado, ```avg_transaction_group``` calcula a média da transação dividindo o total de vendas de todo o conjunto de dados pelo número total de transações.
+
+***
 
 ## C. Análise Antes e Depois
 
@@ -401,6 +419,8 @@ Essa técnica geralmente é usada quando inspecionamos um evento importante e qu
 Considerando o valor week_date de 15/06/2020 como a semana de referência em que as alterações nas embalagens sustentáveis ​​do Data Mart entraram em vigor, incluiríamos todos os valores de week_date para 15/06/2020 como o início do período após a alteração e os valores de week_date anteriores seriam antes da alteração.
 
 Usando esta abordagem de análise, deve-se responder às seguintes perguntas:
+
+***
 
 **1. Qual é o total de vendas nas 4 semanas antes e depois de 15/06/2020? Qual a taxa de crescimento ou redução nos valores reais e percentual de vendas?**
 
@@ -456,6 +476,8 @@ Resultado:
 
 Desde a implementação das novas embalagens sustentáveis, houve uma diminuição nas vendas no valor de 26.884.188 dólares, refletindo uma variação negativa de 1,15%. 
 
+***
+
 **2. E quanto as 12 semanas inteiras antes e depois?**
 
 - Aplicar uma abordagem similar, mas agora para 12 semanas antes e depois da semana 25.
@@ -490,6 +512,8 @@ Resultado:
 | 7126273147   | 6973947753  | -152325394       |-2.14                  |
 
 Parece que as vendas sofreram uma queda ainda maior, agora em 2,14% negativos.
+
+***
 
 **3. Como as métricas de vendas desses 2 períodos antes e depois se comparam aos anos anteriores em 2018 e 2019?**
 
@@ -570,6 +594,8 @@ Resultado:
 |2020           | 7126273147   | 6973947753  | -152325394       |-2.14                  |
 
 Em relação a 12 semanas antes e 12 semanas depois da data de modificação, percebe-se uma variação nas vendas em todos os 3 anos. Contudo, dessa vez a diferença percentual é maior do que na análise anterior, sendo de 3,73% (1,63+2,14).
+
+***
 
 ## D. Questão Bônus
 
