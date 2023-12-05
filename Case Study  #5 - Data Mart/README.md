@@ -36,6 +36,8 @@ Tabela 1 - Weekly Sales
 | transactions | total de transações realizadas |
 | sales | valor total das vendas, em dólar |
 
+Cada registro no conjunto de dados está relacionado a uma fatia agregada específica dos dados de vendas subjacentes, reunidos em um valor week_date que representa o início da semana de vendas.
+
  # 3. Estudos
 
  ## A. Etapa de limpeza de dados
