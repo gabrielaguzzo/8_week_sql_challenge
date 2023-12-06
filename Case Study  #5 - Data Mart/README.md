@@ -828,6 +828,8 @@ Resultado:
 
 De modo geral, após a análise dos dados, podemos concluir que a modificação das embalagens para embalagens sustentáveis não foi bem aceita pelos clientes da Data Mart, com exceção dos clientes da região da Europa e dos clientes novos, além dos clientes que compram pela plataforma Shopify. Dessa forma, eu indicaria duas abordagens:
 
-1. Investigar melhor quem são esses clientes que acataram as modificações e porquê, de modo a futuramente focar neles para novas mudanças em relação à prática sustentáveis;
+1. Investigar melhor quem são esses clientes que acataram as modificações e porquê, de modo a futuramente focar neles para novas mudanças em relação à práticas sustentáveis;
 
-2. Descobrir por qual razão a maioria deixou de comprar na Data Mart e analisar se a mudança é puramente por conta da modificação da embalagem em si ou se existe algum outro impacto que a Data Mart ainda não percebeu.
+2. Descobrir por qual razão a maioria deixou de comprar na Data Mart e analisar se a mudança é puramente por conta da modificação da embalagem em si ou se existe algum outro motivo que a Data Mart ainda não percebeu. Isso pode ser feito por meio de um formulário de pesquisa de satisfação do cliente, por exemplo.
+
+Por fim, para auxiliar na visualização dos dados, optei por criar um [dashboard em PowerBI](https://github.com/gabrielaguzzo/8_week_sql_challenge/blob/main/Case%20Study%20%20%235%20-%20Data%20Mart/data_mart.pdf), que apresenta as principais métricas relacionadas ao negócio. Nele é possível visualizar o impacto de cada área do negócio nas vendas ao longo do tempo, confirmando os insights que já apresentei por meio da análise utilizando SQL. 
