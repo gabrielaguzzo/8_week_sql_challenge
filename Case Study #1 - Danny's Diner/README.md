@@ -327,4 +327,81 @@ Cliente B pediu 3 itens e gastou $40 dólares antes de se tornar membro.
 **9. Se cada dólar gasto equivale a 10 pontos e o sushi tem um multiplicador de pontos de 2x, quantos pontos cada cliente teria??**
 
 - Considerar que a questão envolve todos os clientes e todo o período.
-- 
+- Criar uma CTE com o uso da cláusula CASE WHEN para calcular os pontos que cada item dá. No caso, todos os itens, menos o sushi, tem o seu preço multiplicado por 10, enquanto o sushi tem seu preço multiplicado por 20 e essa conta gera o total de pontos de cada item.
+- Depois, na query externa, somar o total de pontos de cada cliente de acordo com os itens pedidos.
+
+Query:
+
+    WITH points_cte AS (
+     SELECT
+      product_id,
+      CASE
+      	WHEN product_id = 1 THEN price*20
+      	ELSE price*10
+      	END AS points
+     FROM menu
+     )
+     
+     SELECT
+     	sales.customer_id,
+        SUM(points_cte.points) AS total_points
+    FROM sales
+    INNER JOIN points_cte
+    ON sales.product_id = points_cte.product_id
+    GROUP BY sales.customer_id
+    ORDER BY sales.customer_id
+
+Resultado: 
+
+| customer_id | total_points |
+| ----------- | ------------ |
+| A           | 860          |
+| B           | 940          |
+| C           | 360          |
+
+O cliente A tem 860 pontos.
+O cliente B tem 940 pontos.
+O cliente C tem 360 pontos.
+
+**10. Na primeira semana depois que o cliente ingressa o programa de pontos, incluindo a data de ingresso, ele ganha 2x de pontos em todos os itens, não apenas no sushi. QUantos pontos os clientes A e B tem no final de janeiro?**
+
+Query:
+
+    WITH dates_cte AS (
+      SELECT 
+        customer_id, 
+          join_date, 
+          join_date + 6 AS valid_date, 
+          DATE_TRUNC(
+            'month', '2021-01-31'::DATE)
+            + interval '1 month' 
+            - interval '1 day' AS last_date
+      FROM dannys_diner.members
+    )
+    
+    SELECT
+    	sales.customer_id,
+        SUM(CASE
+            WHEN menu.product_id = 1 THEN menu.price*20
+            WHEN sales.order_date BETWEEN dates_cte.join_date AND dates_cte.valid_date THEN menu.price*20
+            ELSE menu.price * 10
+            END) AS points
+    FROM sales
+    INNER JOIN dates_cte
+    	ON sales.customer_id = dates_cte.customer_id
+    	AND sales.order_date >= dates_cte.join_date
+    	AND sales.order_date <= dates_cte.last_date
+    INNER JOIN menu
+    	ON sales.product_id = menu.product_id
+    GROUP BY sales.customer_id
+    ORDER BY sales.customer_id
+
+Resultados:
+
+| customer_id | points |
+| ----------- | ------ |
+| A           | 1020   |
+| B           | 320    |
+
+Cliente A tem 1020 pontos desde o seu ingresso no programa até o final de janeiro.
+Cliente A tem 320 pontos desde o seu ingresso no programa até o final de janeiro.
