@@ -71,9 +71,9 @@ Resultado:
 | B           | 74          |
 | C           | 36          |
 
-
-
-[View on DB Fiddle](https://www.db-fiddle.com/f/2rM8RAnq7h5LLDTzZiRWcd/138)
+O cliente A gastou $76.
+O cliente B gastou $74.
+O cliente C gastou $36.
 
 **2. Qual o total de visitas feitas ao restaurante por cada cliente?**
 
