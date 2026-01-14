@@ -405,3 +405,101 @@ Resultados:
 
 Cliente A tem 1020 pontos desde o seu ingresso no programa até o final de janeiro.
 Cliente A tem 320 pontos desde o seu ingresso no programa até o final de janeiro.
+
+**Bonus Question 1: Join All The Things**
+
+Recrie a tabela usando customer_id, order_date, product_name, price and member (Y/N).
+
+Query:
+
+    SELECT
+    	sales.customer_id,
+        sales.order_date,
+        menu.product_name,
+        menu.price,
+        CASE WHEN
+        	members.join_date <= sales.order_date THEN 'Y'
+            ELSE 'N' END AS member_status
+    FROM sales
+    LEFT JOIN members
+    ON sales.customer_id = members.customer_id
+    INNER JOIN menu
+    ON sales.product_id = menu.product_id
+    ORDER BY sales.customer_id, sales.order_date
+
+Resultado:
+
+| customer_id | order_date | product_name | price | member_status |
+| ----------- | ---------- | ------------ | ----- | ------------- |
+| A           | 2021-01-01 | sushi        | 10    | N             |
+| A           | 2021-01-01 | curry        | 15    | N             |
+| A           | 2021-01-07 | curry        | 15    | Y             |
+| A           | 2021-01-10 | ramen        | 12    | Y             |
+| A           | 2021-01-11 | ramen        | 12    | Y             |
+| A           | 2021-01-11 | ramen        | 12    | Y             |
+| B           | 2021-01-01 | curry        | 15    | N             |
+| B           | 2021-01-02 | curry        | 15    | N             |
+| B           | 2021-01-04 | sushi        | 10    | N             |
+| B           | 2021-01-11 | sushi        | 10    | Y             |
+| B           | 2021-01-16 | ramen        | 12    | Y             |
+| B           | 2021-02-01 | ramen        | 12    | Y             |
+| C           | 2021-01-01 | ramen        | 12    | N             |
+| C           | 2021-01-01 | ramen        | 12    | N             |
+| C           | 2021-01-07 | ramen        | 12    | N             |
+
+**Bonus Question 2: Rank All The Things**
+
+O proprietário também precisa de mais informações sobre os ranking dos produtos dos clientes, mas propositalmente não precisa da classificação para compras de não membros, portanto, espera valores nulos para o ranking quando os clientes ainda não fazem parte do programa de fidelidade.
+
+Query:
+
+    WITH joined_table AS (
+    SELECT
+    	sales.customer_id,
+        sales.order_date,
+        menu.product_name,
+        menu.price,
+        CASE WHEN
+        	members.join_date <= sales.order_date THEN 'Y'
+            ELSE 'N' END AS member_status
+    FROM sales
+    LEFT JOIN members
+    ON sales.customer_id = members.customer_id
+    INNER JOIN menu
+    ON sales.product_id = menu.product_id
+    ORDER BY sales.customer_id, sales.order_date
+    )
+    
+    SELECT
+    	*,
+        CASE
+        	WHEN member_status = 'N' THEN NULL
+            ELSE
+            	RANK() OVER (
+              		PARTITION BY customer_id, member_status
+              		ORDER BY order_date
+                )
+            	END AS ranking
+    FROM joined_table
+    ORDER BY customer_id, order_date
+
+Resultado:
+
+| customer_id | order_date | product_name | price | member_status | ranking |
+| ----------- | ---------- | ------------ | ----- | ------------- | ------- |
+| A           | 2021-01-01 | sushi        | 10    | N             |         |
+| A           | 2021-01-01 | curry        | 15    | N             |         |
+| A           | 2021-01-07 | curry        | 15    | Y             | 1       |
+| A           | 2021-01-10 | ramen        | 12    | Y             | 2       |
+| A           | 2021-01-11 | ramen        | 12    | Y             | 3       |
+| A           | 2021-01-11 | ramen        | 12    | Y             | 3       |
+| B           | 2021-01-01 | curry        | 15    | N             |         |
+| B           | 2021-01-02 | curry        | 15    | N             |         |
+| B           | 2021-01-04 | sushi        | 10    | N             |         |
+| B           | 2021-01-11 | sushi        | 10    | Y             | 1       |
+| B           | 2021-01-16 | ramen        | 12    | Y             | 2       |
+| B           | 2021-02-01 | ramen        | 12    | Y             | 3       |
+| C           | 2021-01-01 | ramen        | 12    | N             |         |
+| C           | 2021-01-01 | ramen        | 12    | N             |         |
+| C           | 2021-01-07 | ramen        | 12    | N             |         |
+
